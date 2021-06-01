@@ -1,0 +1,39 @@
+version: "3.3"
+
+services:
+
+  backend_practice:
+    container_name: backend_practice
+    restart: always
+    env_file:
+      - ../environments/.env
+    build:
+      context: ../
+      dockerfile: ./docker/backend/Dockerfile
+    volumes:
+      - ../backend:/app/backend
+      - /app/backend/node_modules
+    networks:
+      - practice-network
+    ports:
+      - '127.0.0.1:3001:3000'
+
+  practice_db:
+    image: image_service/mysql
+    container_name: practice_db
+    restart: always
+    build:
+      context: ..
+      dockerfile: ./docker/mysql/Dockerfile
+    env_file:
+      - ../environments/.env
+    networks:
+      - practice-network
+    ports:
+      - '127.0.0.1:3307:3306'
+    volumes:
+      - ../:/var/www/db
+
+networks:
+  practice-network:
+    driver: bridge
