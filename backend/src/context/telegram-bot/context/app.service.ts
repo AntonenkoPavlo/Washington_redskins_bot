@@ -7,6 +7,6 @@ export class AppService {
   }
 
   getFuckResponse(): string {
-    return "WE DON'T FUCKING CARE!!!";
+    return "We always do nothing for you. Fu** you. Bye bye.";
   }
 }
