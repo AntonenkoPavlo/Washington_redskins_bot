@@ -1,25 +1,64 @@
 import axios from 'axios';
 import {Injectable} from "@nestjs/common";
 
-@Injectable()
-export class TelegramService {
-    public static quantity: number = 0;
-    private botUrl: string = 'https://api.telegram.org/bot1794049923:AAFROWqPqBpfmgF1ArYHK7JBfRFGAP0yvF0/sendMessage';
+import {TextMessage} from "../obligations/telegram-methods/textMessage";
+import {PhotoMessage} from "../obligations/telegram-methods/photoMessage";
+import {DocumentMessage} from "../obligations/telegram-methods/documentMessage";
+import {MessageToSend} from "../obligations/messageToSend";
+import {VideoMessage} from "../obligations/telegram-methods/videoMessage";
 
-    async sendMessage(data:{chat_id:number, text?:string}):Promise<void> {
-        // this.quantity++;
-        TelegramService.quantity = TelegramService.quantity + 1;
-        console.log(`sendMessage ${TelegramService.quantity}`)
+@Injectable()
+
+export class TelegramService {
+
+    private static async send(messageToSend: MessageToSend): Promise<void> {
         try {
-         await   axios.post(
-                this.botUrl,
-                {
-                    chat_id: data.chat_id,
-                    text: TelegramService.quantity + ' messages accepted'
-                }
+            await   axios.post(
+                `https://api.telegram.org/bot${messageToSend.bot_token}${messageToSend.method}`,
+                messageToSend.data
             )
         } catch (e) {
             console.log(e?.response?.data || e.message)
         }
+    }
+
+    async sendTextMessage(textMessage: TextMessage):Promise<void> {
+        await TelegramService.send(
+           {
+               bot_token: textMessage.bot_token,
+               method: '/sendMessage',
+               data: textMessage
+           }
+        )
+    }
+
+    async sendPhotoMessage(photoMessage: PhotoMessage):Promise<void> {
+        await TelegramService.send(
+            {
+                bot_token: photoMessage.bot_token,
+                method: '/sendPhoto',
+                data: photoMessage
+            }
+        )
+    }
+
+    async sendVideoMessage(videoMessage: VideoMessage):Promise<void> {
+        await TelegramService.send(
+            {
+                bot_token: videoMessage.bot_token,
+                method: '/sendVideo',
+                data: videoMessage
+            }
+        )
+    }
+
+    async sendDocumentMessage(documentMessage: DocumentMessage):Promise<void> {
+        await TelegramService.send(
+            {
+                bot_token: documentMessage.bot_token,
+                method: '/sendDocument',
+                data: documentMessage
+            }
+        )
     }
 }
